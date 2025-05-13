@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register – Blogify</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 text-white min-h-screen flex flex-col">
+
+  <header class="flex items-center justify-between px-8 py-6 shadow-md bg-gray-900">
+    <h1 class="text-2xl font-bold tracking-wider text-indigo-400">Blogify</h1>
+    <a href="{% url 'home' %}" class="text-gray-300 hover:text-white transition">Home</a>
+  </header>
+
+  <main class="flex-grow flex items-center justify-center px-6">
+    <div class="w-full max-w-md bg-gray-800 p-8 rounded-lg shadow-lg">
+      <h2 class="text-3xl font-bold mb-6 text-center text-indigo-400">Register</h2>
+      <form id="registerForm">
+        <div class="mb-4 grid grid-cols-2 gap-4">
+          <div>
+            <label for="firstName" class="block mb-2 text-sm font-semibold">First Name</label>
+            <input type="text" id="firstName" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <p class="mt-1 text-xs text-red-400" id="first-name-error"></p>
+          </div>
+          <div>
+            <label for="lastName" class="block mb-2 text-sm font-semibold">Last Name</label>
+            <input type="text" id="lastName" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <p class="mt-1 text-xs text-red-400" id="last-name-error"></p>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label for="email" class="block mb-2 text-sm font-semibold">Email</label>
+          <input type="email" id="email" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="mt-1 text-xs text-red-400" id="email-error"></p>
+        </div>
+        <div class="mb-4">
+          <label for="password" class="block mb-2 text-sm font-semibold">Password</label>
+          <input type="password" id="password" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="mt-1 text-xs text-red-400" id="password-error"></p>
+        </div>
+        <div class="mb-6">
+          <label for="confirmPassword" class="block mb-2 text-sm font-semibold">Confirm Password</label>
+          <input type="password" id="confirmPassword" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="mt-1 text-xs text-red-400" id="confirm-password-error"></p>
+        </div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded transition">Register</button>
+      </form>
+      <p class="mt-4 text-sm text-gray-400 text-center">
+        Already have an account?
+        <a href="{% url 'login' %}" class="text-indigo-400 hover:underline">Login</a>
+      </p>
+      <p class="mt-4 text-sm text-red-400 text-center" id="error-message"></p>
+      <p class="mt-4 text-sm text-green-400 text-center" id="success-message"></p>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById("registerForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const firstNameInput = document.getElementById("firstName");
+      const lastNameInput = document.getElementById("lastName");
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
+      const confirmPasswordInput = document.getElementById("confirmPassword");
+
+      const firstNameError = document.getElementById("first-name-error");
+      const lastNameError = document.getElementById("last-name-error");
+      const emailError = document.getElementById("email-error");
+      const passwordError = document.getElementById("password-error");
+      const confirmPasswordError = document.getElementById("confirm-password-error");
+      const errorMessage = document.getElementById("error-message");
+      const successMessage = document.getElementById("success-message");
+
+      let isValid = true;
+
+      // First Name validation
+      if (!firstNameInput.value.trim()) {
+        firstNameError.innerText = "First Name is required.";
+        isValid = false;
+      } else {
+        firstNameError.innerText = "";
+      }
+
+      // Last Name validation
+      if (!lastNameInput.value.trim()) {
+        lastNameError.innerText = "Last Name is required.";
+        isValid = false;
+      } else {
+        lastNameError.innerText = "";
+      }
+
+      // Email validation
+      if (!emailInput.value.trim()) {
+        emailError.innerText = "Email is required.";
+        isValid = false;
+      } else if (!isValidEmail(emailInput.value.trim())) {
+        emailError.innerText = "Please enter a valid email address.";
+        isValid = false;
+      } else {
+        emailError.innerText = "";
+      }
+
+      // Password validation
+      if (!passwordInput.value.trim()) {
+        passwordError.innerText = "Password is required.";
+        isValid = false;
+      } else if (passwordInput.value.trim().length < 6) {
+        passwordError.innerText = "Password must be at least 6 characters long.";
+        isValid = false;
+      } else {
+        passwordError.innerText = "";
+      }
+
+      // Confirm Password validation
+      if (!confirmPasswordInput.value.trim()) {
+        confirmPasswordError.innerText = "Confirm Password is required.";
+        isValid = false;
+      } else if (confirmPasswordInput.value.trim() !== passwordInput.value.trim()) {
+        confirmPasswordError.innerText = "Passwords do not match.";
+        isValid = false;
+      } else {
+        confirmPasswordError.innerText = "";
+      }
+
+      if (isValid) {
+        const first_name = firstNameInput.value;
+        const last_name = lastNameInput.value;
+        const email = emailInput.value;
+        const password = passwordInput.value;
+
+        try {
+          const response = await fetch("/api/user/register/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ first_name, last_name, email, password }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            successMessage.innerText = "Registration successful! You can now log in.";
+            errorMessage.innerText = "";
+            document.getElementById("registerForm").reset();
+            // Optionally redirect: window.location.href = "/login";
+          } else {
+            errorMessage.innerText = data.detail || "Registration failed. Please try again.";
+            successMessage.innerText = "";
+          }
+        } catch (error) {
+          errorMessage.innerText = "An unexpected error occurred.";
+          successMessage.innerText = "";
+          console.error("Registration error:", error);
+        }
+      } else {
+        errorMessage.innerText = "Please correct the errors in the form.";
+        successMessage.innerText = "";
+      }
+    });
+
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+  </script>
+</body>
+</html>
