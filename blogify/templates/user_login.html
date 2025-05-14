@@ -1,108 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Login – Blogify</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gradient-to-br from-gray-900 to-gray-800 text-white min-h-screen flex flex-col">
+{% extends 'base.html' %}
 
-  <header class="flex items-center justify-between px-8 py-6 shadow-md bg-gray-900">
-    <h1 class="text-2xl font-bold tracking-wider text-indigo-400">Blogify</h1>
-    <a href="{% url 'home' %}" class="text-gray-300 hover:text-white">Home</a>
-  </header>
+{% block title %}Login – Blogify{% endblock %}
 
-  <main class="flex-grow flex items-center justify-center px-6">
-    <div class="w-full max-w-md bg-gray-800 p-8 rounded-lg shadow-lg">
-      <h2 class="text-3xl font-bold mb-6 text-center text-indigo-400">Login</h2>
-      <form id="loginForm">
+{% block content %}
+<div class="w-full max-w-md bg-gray-800 p-8 rounded-lg shadow-lg">
+    <h2 class="text-3xl font-bold mb-6 text-center text-indigo-400">Login</h2>
+    <form id="loginForm">
         <div class="mb-4">
-          <label for="email" class="block mb-2 text-sm font-semibold">Email</label>
-          <input type="email" id="email" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded" />
-          <p class="mt-1 text-xs text-red-400" id="email-error"></p>
+            <label for="email" class="block mb-2 text-sm font-semibold text-left">Email</label>
+            <input type="email" id="email" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded" />
+            <p class="mt-1 text-xs text-red-400" id="email-error"></p>
         </div>
         <div class="mb-6">
-          <label for="password" class="block mb-2 text-sm font-semibold">Password</label>
-          <input type="password" id="password" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded" />
-          <p class="mt-1 text-xs text-red-400" id="password-error"></p>
+            <label for="password" class="block mb-2 text-sm font-semibold text-left">Password</label>
+            <input type="password" id="password" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded" />
+            <p class="mt-1 text-xs text-red-400" id="password-error"></p>
         </div>
         <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded transition">Login</button>
-      </form>
-      <p class="mt-4 text-sm text-red-400 text-center" id="error-message"></p>
-      <p class="mt-4 text-sm text-gray-400 text-center">
+    </form>
+    <p class="mt-4 text-sm text-red-400 text-center" id="error-message"></p>
+    <p class="mt-4 text-sm text-gray-400 text-center">
         Don't have an account?
         <a href="{% url 'register' %}" class="text-indigo-400 hover:underline">Register</a>
-      </p>
-    </div>
-  </main>
+    </p>
+</div>
+{% endblock %}
 
-  <script>
+{% block scripts %}
+<script>
     document.getElementById("loginForm").addEventListener("submit", async function (e) {
-      e.preventDefault();
+        e.preventDefault();
 
-      const emailInput = document.getElementById("email");
-      const passwordInput = document.getElementById("password");
-      const emailError = document.getElementById("email-error");
-      const passwordError = document.getElementById("password-error");
-      const errorMessage = document.getElementById("error-message");
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+        const emailError = document.getElementById("email-error");
+        const passwordError = document.getElementById("password-error");
+        const errorMessage = document.getElementById("error-message");
 
-      let isValid = true;
+        let isValid = true;
 
-      // Email validation
-      if (!emailInput.value.trim()) {
-        emailError.innerText = "Email is required.";
-        isValid = false;
-      } else if (!isValidEmail(emailInput.value.trim())) {
-        emailError.innerText = "Please enter a valid email address.";
-        isValid = false;
-      } else {
-        emailError.innerText = "";
-      }
-
-      // Password validation
-      if (!passwordInput.value.trim()) {
-        passwordError.innerText = "Password is required.";
-        isValid = false;
-      } else {
-        passwordError.innerText = "";
-      }
-
-      if (isValid) {
-        // Proceed with API call if validation passes
-        const email = emailInput.value;
-        const password = passwordInput.value;
-
-        try {
-          const response = await fetch("/api/token/", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
-          });
-
-          const data = await response.json();
-
-          if (response.ok) {
-            localStorage.setItem("access_token", data.access);
-            localStorage.setItem("refresh_token", data.refresh);
-            alert("Login successful!");
-            window.location.href = "/blogs";
-          } else {
-            errorMessage.innerText = data.detail || "Login failed. Please try again.";
-          }
-        } catch (error) {
-          errorMessage.innerText = "An unexpected error occurred.";
-          console.error("Login error:", error);
+        // Email validation
+        if (!emailInput.value.trim()) {
+            emailError.innerText = "Email is required.";
+            isValid = false;
+        } else if (!isValidEmail(emailInput.value.trim())) {
+            emailError.innerText = "Please enter a valid email address.";
+            isValid = false;
+        } else {
+            emailError.innerText = "";
         }
-      }
+
+        // Password validation
+        if (!passwordInput.value.trim()) {
+            passwordError.innerText = "Password is required.";
+            isValid = false;
+        } else {
+            passwordError.innerText = "";
+        }
+
+        if (isValid) {
+            // Proceed with API call if validation passes
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            try {
+                const response = await fetch("/api/token/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem("access_token", data.access);
+                    localStorage.setItem("refresh_token", data.refresh);
+                    localStorage.setItem("user", JSON.stringify(data.user));              
+                    window.location.href = "/blogs";
+                } else {
+                    errorMessage.innerText = data.detail || "Login failed. Please try again.";
+                }
+            } catch (error) {
+                errorMessage.innerText = "An unexpected error occurred.";
+                console.error("Login error:", error);
+            }
+        }
     });
 
     function isValidEmail(email) {
-      // Basic email validation regex
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(email);
+        // Basic email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
     }
-  </script>
-</body>
-</html>
+</script>
+{% endblock %}
+
